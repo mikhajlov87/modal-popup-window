@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
-import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
+import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
+import FormField from '../FormField/FormField';
 import { grey300, grey400 } from 'material-ui/styles/colors.js';
 import './modal.css';
 
@@ -28,16 +29,18 @@ const styles = {
     borderColor: grey400
   },
   modalFooter: {
-    textAlign: "left"
+    textAlign: "left",
+    padding: 24
+  },
+  addButton: {
+    padding: 0
   }
 };
 
-/**
- * Dialog content can be scrollable.
- */
-export default class Modal extends React.Component {
+export default class Modal extends Component {
   state = {
     open: false,
+    formFields: []
   };
 
   handleOpen = () => {
@@ -52,7 +55,57 @@ export default class Modal extends React.Component {
     });
   };
 
+  addFormField = () => {
+    let formFields = this.state.formFields,
+      count = formFields.length;
+    formFields.push(<FormField id={count} key={count} />)
+
+    this.setState({
+      formFields: formFields
+    })
+    console.log(this.state.formFields)
+  }
+
+  componentWillMount() {
+    const formFields = [];
+
+    const initialState = {
+      0: {
+        defaultValue: 1,
+        defaultTextValue: 22
+      },
+      1: {
+        defaultValue: 2,
+        defaultTextValue: 12
+      },
+      2: {
+        defaultValue: 3,
+        defaultTextValue: 2
+      }
+    };
+
+    for (let item in initialState) {
+
+      for (let key in initialState[item]) {
+
+        formFields.push(
+          <FormField
+            id={item}
+            key={item}
+            defaultValue={initialState[item].defaultValue}
+            defaultTextValue={initialState[item].defaultTextValue} />
+        );
+        break;
+      }
+
+    }
+    this.setState({
+      formFields: formFields
+    });
+  }
+
   render() {
+
     const actions = [
       <RaisedButton
         label="сохранить"
@@ -60,24 +113,14 @@ export default class Modal extends React.Component {
         style={styles.submitButton}
         onClick={this.handleClose}
       />,
-      <RaisedButton
+      <FlatButton
         label="отмена"
         style={styles.canselButton}
         onClick={this.handleClose}
-      />,
+      />
     ];
 
-    const radios = [];
-    for (let i = 0; i < 5; i++) {
-      radios.push(
-        <RadioButton
-          key={i}
-          value={`value${i + 1}`}
-          label={`Option ${i + 1}`}
-          style={styles.radioButton}
-        />
-      );
-    }
+
 
     const modalHeader = [
       <div
@@ -109,9 +152,16 @@ export default class Modal extends React.Component {
           titleStyle={styles.modalHeader}
           overlayStyle={styles.overlay}
         >
-          <RadioButtonGroup name="shipSpeed" defaultSelected="not_light">
-            {radios}
-          </RadioButtonGroup>
+          <form>
+            {this.state.formFields}
+            <FlatButton
+              label="добавить"
+              primary={true}
+              hoverColor="transparent"
+              style={styles.addButton}
+              onClick={this.addFormField}
+            />
+          </form>
         </Dialog>
       </div>
     );
