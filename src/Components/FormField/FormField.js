@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
@@ -55,7 +55,8 @@ export default class FormField extends Component {
         <FloatingActionButton
           mini={true}
           backgroundColor={red100}
-          iconStyle={styles.clearButton}>
+          iconStyle={styles.clearButton}
+          onClick={this.props.removeItem}>
           <ContentClear />
         </FloatingActionButton>
       </div>

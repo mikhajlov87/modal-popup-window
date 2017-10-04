@@ -40,7 +40,21 @@ const styles = {
 export default class Modal extends Component {
   state = {
     open: false,
-    formFields: []
+    storage: [],
+    formFields: [
+      {
+        defaultValue: 1,
+        defaultTextValue: 22
+      },
+      {
+        defaultValue: 2,
+        defaultTextValue: 12
+      },
+      {
+        defaultValue: 3,
+        defaultTextValue: 2
+      }
+    ]
   };
 
   handleOpen = () => {
@@ -51,61 +65,33 @@ export default class Modal extends Component {
 
   handleClose = () => {
     this.setState({
-      open: false
+      open: false,
+      storage: []
     });
   };
 
   addFormField = () => {
-    let formFields = this.state.formFields,
-      count = formFields.length;
-    formFields.push(<FormField id={count} key={count} />)
-
+    const count = this.state.formFields.length + this.state.storage.length;
     this.setState({
-      formFields: formFields
+      storage: [...this.state.storage, <FormField id={count + ''} key={count} />]
     })
-    console.log(this.state.formFields)
   }
 
-  componentWillMount() {
-    const formFields = [];
+  removeItem = () => {
 
-    const initialState = {
-      0: {
-        defaultValue: 1,
-        defaultTextValue: 22
-      },
-      1: {
-        defaultValue: 2,
-        defaultTextValue: 12
-      },
-      2: {
-        defaultValue: 3,
-        defaultTextValue: 2
-      }
-    };
-
-    for (let item in initialState) {
-
-      for (let key in initialState[item]) {
-
-        formFields.push(
-          <FormField
-            id={item}
-            key={item}
-            defaultValue={initialState[item].defaultValue}
-            defaultTextValue={initialState[item].defaultTextValue} />
-        );
-        break;
-      }
-
-    }
-    this.setState({
-      formFields: formFields
-    });
   }
 
   render() {
-
+    const formFields = this.state.formFields.map(
+      (item, index) =>
+        <FormField
+          id={index + ''}
+          key={index}
+          defaultValue={item.defaultValue}
+          defaultTextValue={item.defaultTextValue}
+          removeItem={this.removeItem}
+        />
+      );
     const actions = [
       <RaisedButton
         label="сохранить"
@@ -119,8 +105,6 @@ export default class Modal extends Component {
         onClick={this.handleClose}
       />
     ];
-
-
 
     const modalHeader = [
       <div
@@ -138,7 +122,10 @@ export default class Modal extends Component {
 
     return (
       <div>
-        <RaisedButton label="Scrollable Dialog" onClick={this.handleOpen} />
+        <RaisedButton
+          label="Scrollable Dialog"
+          onClick={this.handleOpen}
+        />
         <Dialog
           title={modalHeader}
           actions={actions}
@@ -153,7 +140,7 @@ export default class Modal extends Component {
           overlayStyle={styles.overlay}
         >
           <form>
-            {this.state.formFields}
+            {formFields}{this.state.storage}
             <FlatButton
               label="добавить"
               primary={true}
