@@ -35,7 +35,7 @@ export default class Form extends Component {
                 key={item.index}
                 defaultValue={item.defaultValue}
                 defaultTextValue={item.defaultTextValue}
-                removeItem={this.props.removeItem.bind(this, item.index)}
+                removeItem={this.props.removeStorageItem.bind(this, item.index)}
               />
             )}
           </CSSTransitionGroup>

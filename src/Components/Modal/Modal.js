@@ -6,6 +6,7 @@ import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import { grey300, grey400 } from 'material-ui/styles/colors.js';
 import Form from '../Form/Form';
+import { reactLocalStorage } from 'reactjs-localstorage';
 import './modal.css';
 
 const styles = {
@@ -38,35 +39,19 @@ export default class Modal extends Component {
   state = {
     open: false,
     storage: [],
-    formFields: [
-      {
-        index: "0",
-        defaultValue: 1,
-        defaultTextValue: 22
-      },
-      {
-        index: "1",
-        defaultValue: 2,
-        defaultTextValue: 12
-      },
-      {
-        index: "2",
-        defaultValue: 3,
-        defaultTextValue: 2
-      }
-    ]
+    formFields: []
   };
 
   handleOpen = () => {
-    this.setState({
-      open: true
-    });
+    const initialState = reactLocalStorage.getObject('modalState');
+    initialState.slice ? this.setState({open: true, formFields: initialState}) : this.getInitialState();
   };
 
   handleClose = () => {
     this.setState({
       open: false,
-      storage: []
+      storage: [],
+      formFields: []
     });
   };
 
@@ -91,7 +76,7 @@ export default class Modal extends Component {
 
   removeStorageItem = (id) => {
     const formFields = this.state.storage;
-    let formFieldsArr = formFields.filter(el => el.key !== id )
+    let formFieldsArr = formFields.filter(el => el.index !== id )
     this.setState({
       storage: formFieldsArr
     });
@@ -101,10 +86,40 @@ export default class Modal extends Component {
     this.handleClose();
     let formFields = this.state.formFields,
       storage = this.state.storage;
-    this.setState({
-      formFields: [...formFields, ...storage],
-      storage: []
-    });
+    reactLocalStorage.setObject('modalState', [...formFields, ...storage]);
+  }
+
+  componentWillMount() {
+    this.getInitialState();
+  }
+
+  getInitialState = () => {
+    const initialState = reactLocalStorage.getObject('modalState');
+    if (initialState.splice) {
+      this.setState({
+        formFields: initialState
+      })
+    } else {
+      const setInitialState = [
+        {
+          index: "0",
+          defaultValue: 1,
+          defaultTextValue: 22
+        },
+        {
+          index: "1",
+          defaultValue: 2,
+          defaultTextValue: 12
+        },
+        {
+          index: "2",
+          defaultValue: 3,
+          defaultTextValue: 2
+        }
+      ];
+      reactLocalStorage.setObject('modalState', setInitialState);
+      this.setState({ formFields: setInitialState });
+    }
   }
 
   render() {
@@ -158,6 +173,7 @@ export default class Modal extends Component {
           <Form
             formFields={this.state.formFields}
             removeItem={this.removeItem}
+            removeStorageItem={this.removeStorageItem}
             storage={this.state.storage}
             addFormField={this.addFormField}
           />
