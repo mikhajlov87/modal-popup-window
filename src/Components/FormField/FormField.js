@@ -30,7 +30,9 @@ export default class FormField extends Component {
     textField: this.props.defaultTextValue || 22
   };
 
-  handleChange = (event, index, value) => this.setState({value});
+  handleChange = (event, index, value) => {
+    this.setState({value})
+  };
 
   render() {
     return (

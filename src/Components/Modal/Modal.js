@@ -4,8 +4,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import FormField from '../FormField/FormField';
 import { grey300, grey400 } from 'material-ui/styles/colors.js';
+import Form from '../Form/Form';
 import './modal.css';
 
 const styles = {
@@ -31,9 +31,6 @@ const styles = {
   modalFooter: {
     textAlign: "left",
     padding: 24
-  },
-  addButton: {
-    padding: 0
   }
 };
 
@@ -43,14 +40,17 @@ export default class Modal extends Component {
     storage: [],
     formFields: [
       {
+        index: "0",
         defaultValue: 1,
         defaultTextValue: 22
       },
       {
+        index: "1",
         defaultValue: 2,
         defaultTextValue: 12
       },
       {
+        index: "2",
         defaultValue: 3,
         defaultTextValue: 2
       }
@@ -73,31 +73,47 @@ export default class Modal extends Component {
   addFormField = () => {
     const count = this.state.formFields.length + this.state.storage.length;
     this.setState({
-      storage: [...this.state.storage, <FormField id={count + ''} key={count} />]
+      storage: [...this.state.storage, {
+        index: count + '',
+        defaultValue: 1,
+        defaultTextValue: 22
+      }]
     })
   }
 
-  removeItem = () => {
+  removeItem = (id) => {
+    let formFields = this.state.formFields;
+    let formFieldsArr = formFields.filter(el => el.index !== id )
+    this.setState({
+      formFields: formFieldsArr
+    });
+  }
 
+  removeStorageItem = (id) => {
+    const formFields = this.state.storage;
+    let formFieldsArr = formFields.filter(el => el.key !== id )
+    this.setState({
+      storage: formFieldsArr
+    });
+  }
+
+  safeChanges = () => {
+    this.handleClose();
+    let formFields = this.state.formFields,
+      storage = this.state.storage;
+    this.setState({
+      formFields: [...formFields, ...storage],
+      storage: []
+    });
   }
 
   render() {
-    const formFields = this.state.formFields.map(
-      (item, index) =>
-        <FormField
-          id={index + ''}
-          key={index}
-          defaultValue={item.defaultValue}
-          defaultTextValue={item.defaultTextValue}
-          removeItem={this.removeItem}
-        />
-      );
     const actions = [
       <RaisedButton
         label="сохранить"
         primary={true}
         style={styles.submitButton}
-        onClick={this.handleClose}
+        onClick={this.safeChanges}
       />,
       <FlatButton
         label="отмена"
@@ -139,16 +155,12 @@ export default class Modal extends Component {
           titleStyle={styles.modalHeader}
           overlayStyle={styles.overlay}
         >
-          <form>
-            {formFields}{this.state.storage}
-            <FlatButton
-              label="добавить"
-              primary={true}
-              hoverColor="transparent"
-              style={styles.addButton}
-              onClick={this.addFormField}
-            />
-          </form>
+          <Form
+            formFields={this.state.formFields}
+            removeItem={this.removeItem}
+            storage={this.state.storage}
+            addFormField={this.addFormField}
+          />
         </Dialog>
       </div>
     );
